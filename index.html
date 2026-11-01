@@ -9,6 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Word a Day">
 <title>Word of the Day</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,100..900,0..100;1,9..144,100..900,0..100&display=swap" rel="stylesheet">
@@ -240,301 +243,25 @@ body{
 
 <p class="sr-only" id="live" aria-live="polite"></p>
 
+<script src="words.js"></script>
 <script>
 (function(){
   "use strict";
 
-  // [word, pronunciation, part of speech, meaning in simple terms, example]
-  // Pronunciation is left empty for phrases and slang.
-  const HARD = [
-    ["Serendipity","ser-un-DIP-uh-tee","noun","Finding something good by happy accident, when you weren't looking for it.","Meeting my best friend on a delayed train was pure serendipity."],
-    ["Kerfuffle","ker-FUF-ul","noun","A fuss or commotion, usually over something small.","There was a kerfuffle over the last slice of pizza."],
-    ["Ephemeral","ih-FEM-er-ul","adjective","Lasting for only a very short time.","The sunset colors were ephemeral, gone in a few minutes."],
-    ["Petrichor","PET-rih-kor","noun","The fresh, earthy smell in the air when rain falls on dry ground.","I opened the window just to breathe in the petrichor."],
-    ["Ubiquitous","yoo-BIK-wuh-tus","adjective","Found everywhere, all the time.","Phones are ubiquitous now; everyone has one."],
-    ["Flabbergasted","FLAB-er-gas-tid","adjective","So surprised you hardly know what to say.","I was flabbergasted when I won the raffle."],
-    ["Mellifluous","muh-LIF-loo-us","adjective","Sweet and smooth to listen to.","Her mellifluous voice calmed the whole room."],
-    ["Resilient","rih-ZIL-yunt","adjective","Able to bounce back quickly after something hard happens.","Kids are resilient; she was smiling again by lunch."],
-    ["Quixotic","kwik-SOT-ik","adjective","Full of big, hopeful ideas that aren't very practical.","His quixotic plan was to read every book in the library."],
-    ["Lollygag","LOL-ee-gag","verb","To waste time by dawdling or fooling around.","Stop lollygagging and get in the car!"],
-    ["Halcyon","HAL-see-un","adjective","Calm, peaceful and happy, often about a time in the past.","We still talk about the halcyon days of summer camp."],
-    ["Luminous","LOO-muh-nus","adjective","Full of light; glowing or shining.","The jellyfish were luminous in the dark water."],
-    ["Candor","KAN-der","noun","Being honest and open, even when it's uncomfortable.","I appreciated her candor about my business plan."],
-    ["Gobbledygook","GOB-ul-dee-gook","noun","Language so full of jargon that it's hard to understand.","The contract was pure gobbledygook."],
-    ["Wanderlust","WON-der-lust","noun","A strong wish to travel and explore the world.","Every travel video gives me serious wanderlust."],
-    ["Eloquent","EL-uh-kwunt","adjective","Able to speak or write clearly and beautifully.","His eloquent speech had everyone listening."],
-    ["Pragmatic","prag-MAT-ik","adjective","Focused on what actually works in real life.","Let's be pragmatic and fix the leak first."],
-    ["Brouhaha","BROO-hah-hah","noun","A noisy fuss or uproar.","The new parking rule caused a big brouhaha."],
-    ["Nostalgia","nuh-STAL-juh","noun","A warm, slightly sad longing for the past.","Old cartoons fill me with nostalgia."],
-    ["Tenacious","tuh-NAY-shus","adjective","Refusing to give up; holding on tight.","The tenacious puppy would not let go of the rope."],
-    ["Benevolent","buh-NEV-uh-lunt","adjective","Kind and wanting to do good for others.","A benevolent neighbor shoveled everyone's driveway."],
-    ["Discombobulated","dis-kum-BOB-yuh-lay-tid","adjective","Confused and flustered.","The jet lag left me totally discombobulated."],
-    ["Lethargic","luh-THAR-jik","adjective","Sleepy, slow and low on energy.","The heat made everyone lethargic."],
-    ["Gregarious","grih-GAIR-ee-us","adjective","Loves being around people; very social.","My gregarious uncle talks to everyone at parties."],
-    ["Meticulous","muh-TIK-yuh-lus","adjective","Very careful about every small detail.","She keeps meticulous notes for every project."],
-    ["Defenestration","dee-fen-uh-STRAY-shun","noun","The act of throwing someone or something out of a window.","After the third crash, my laptop came close to defenestration."],
-    ["Ambivalent","am-BIV-uh-lunt","adjective","Having mixed feelings about something.","I'm ambivalent about moving: excited, but nervous."],
-    ["Euphoria","yoo-FOR-ee-uh","noun","A feeling of intense happiness and excitement.","Crossing the finish line filled her with euphoria."],
-    ["Cacophony","kuh-KOF-uh-nee","noun","A loud, messy mix of unpleasant sounds.","The band warming up was a total cacophony."],
-    ["Facetious","fuh-SEE-shus","adjective","Joking at a moment that's meant to be serious.","He was being facetious when he offered to sell his brother."],
-    ["Sanguine","SANG-gwin","adjective","Cheerful and hopeful about the future, even in a tough spot.","She stayed sanguine about the tight deadline."],
-    ["Ineffable","in-EF-uh-bul","adjective","Too amazing to describe in words.","The view from the summit was ineffable."],
-    ["Zealous","ZEL-us","adjective","Full of energy and passion for something.","The zealous fans painted their faces for the game."],
-    ["Lackadaisical","lak-uh-DAY-zih-kul","adjective","Lazy and not putting in much effort.","His lackadaisical attitude slowed the whole team down."],
-    ["Paradox","PAIR-uh-doks","noun","Something that seems to contradict itself but may still be true.","\"Less is more\" is a famous paradox."],
-    ["Ethereal","ih-THEER-ee-ul","adjective","So light and delicate it seems out of this world.","The fog gave the forest an ethereal look."],
-    ["Hubris","HYOO-bris","noun","Too much pride, the kind that leads to a fall.","His hubris made him skip practice before the final."],
-    ["Conundrum","kuh-NUN-drum","noun","A confusing problem that's hard to solve.","Pizza or tacos for dinner: a real conundrum."],
-    ["Ebullient","ih-BUL-yunt","adjective","Bubbling over with excitement and cheer.","The ebullient host greeted every guest with a hug."],
-    ["Procrastinate","proh-KRAS-tuh-nayt","verb","To keep putting something off until later.","I procrastinate on laundry until I run out of socks."],
-    ["Vicarious","vy-KAIR-ee-us","adjective","Felt through someone else's experience instead of your own.","I get vicarious joy from watching travel vlogs."],
-    ["Fortuitous","for-TOO-ih-tus","adjective","Happening by lucky chance.","A fortuitous wrong turn led us to the best café in town."],
-    ["Ostentatious","os-ten-TAY-shus","adjective","Showy in a way that's meant to impress people.","The ostentatious car had gold-plated wheels."],
-    ["Pensive","PEN-siv","adjective","Quietly deep in thought.","He looked pensive, staring out at the ocean."],
-    ["Juxtapose","JUK-stuh-pohz","verb","To put two things side by side to show how different they are.","The photo juxtaposes old houses with shiny new towers."],
-    ["Bamboozle","bam-BOO-zul","verb","To trick or fool someone.","The magician bamboozled the whole audience."],
-    ["Effervescent","ef-er-VES-unt","adjective","Bubbly, like soda or a lively, cheerful person.","Her effervescent personality lights up any room."],
-    ["Magnanimous","mag-NAN-uh-mus","adjective","Generous and forgiving, especially toward a rival.","The champion was magnanimous in victory."],
-    ["Enigma","ih-NIG-muh","noun","A person or thing that's mysterious and hard to figure out.","The new neighbor is a total enigma."],
-    ["Placate","PLAY-kayt","verb","To calm someone down by giving them something they want.","We placated the toddler with a cookie."],
-    ["Solace","SOL-is","noun","Comfort when you're sad or upset.","She found solace in long evening walks."],
-    ["Verbose","ver-BOHS","adjective","Using way more words than needed.","The verbose email could have been one sentence."],
-    ["Whimsical","WIM-zih-kul","adjective","Playful, quirky and a little fanciful.","The café had whimsical teacup-shaped chairs."],
-    ["Nincompoop","NIN-kum-poop","noun","A silly or foolish person.","Only a nincompoop would put ketchup on ice cream."],
-    ["Nonchalant","non-shuh-LAHNT","adjective","Calm and relaxed, as if you don't care much.","He stayed nonchalant even after scoring the winning goal."],
-    ["Labyrinth","LAB-uh-rinth","noun","A complicated maze of paths or passages.","The old library was a labyrinth of shelves."],
-    ["Epiphany","ih-PIF-uh-nee","noun","A sudden moment when you understand something clearly.","I had an epiphany about the puzzle in the shower."],
-    ["Frugal","FROO-gul","adjective","Careful not to waste money or things.","Being frugal helped them save for a house."],
-    ["Ardent","AR-dunt","adjective","Very passionate and enthusiastic.","She's an ardent fan of the local team."],
-    ["Clandestine","klan-DES-tin","adjective","Done in secret, often because it isn't allowed.","They held a clandestine midnight snack party."],
-    ["Mundane","mun-DAYN","adjective","Ordinary and a bit boring.","Even mundane chores feel better with music on."],
-    ["Cattywampus","KAT-ee-wom-pus","adjective","Crooked, tilted or out of line.","After the move, every picture was hanging cattywampus."],
-    ["Audacious","aw-DAY-shus","adjective","Bold and daring; willing to take big risks.","Climbing the mountain solo was an audacious move."],
-    ["Respite","RES-pit","noun","A short break from something hard or unpleasant.","The shade gave us a brief respite from the sun."],
-    ["Idiosyncrasy","id-ee-oh-SING-kruh-see","noun","A quirky habit or trait that's unique to someone.","Dipping fries in ice cream is one of his idiosyncrasies."],
-    ["Panacea","pan-uh-SEE-uh","noun","A supposed cure for every problem.","Coffee isn't a panacea, but it helps."],
-    ["Bucolic","byoo-KOL-ik","adjective","Relating to calm, pleasant countryside life.","They moved to a bucolic farm with cows and open fields."],
-    ["Altruism","AL-troo-iz-um","noun","Helping others without expecting anything back.","Volunteering every weekend is pure altruism."],
-    ["Shenanigans","shuh-NAN-ih-gunz","noun","Silly or mischievous behavior.","No shenanigans at grandma's house, please."],
-    ["Cogent","KOH-junt","adjective","Clear, logical and convincing.","She made a cogent case for a four-day week."],
-    ["Plethora","PLETH-er-uh","noun","A large amount, often more than you need.","The menu had a plethora of options."],
-    ["Reverie","REV-uh-ree","noun","A pleasant daydream.","The school bell snapped him out of his reverie."],
-    ["Eccentric","ik-SEN-trik","adjective","Unusual and a little odd, in a harmless way.","The eccentric artist wore mismatched shoes on purpose."],
-    ["Penchant","PEN-chunt","noun","A strong liking for something, or a habit of doing it.","She has a penchant for very spicy food."],
-    ["Vivacious","vih-VAY-shus","adjective","Lively, spirited and full of energy.","The vivacious dancer lit up the stage."],
-    ["Cathartic","kuh-THAR-tik","adjective","Letting out strong feelings in a way that leaves you feeling better.","Crying at the movie was surprisingly cathartic."],
-    ["Insouciant","in-SOO-see-unt","adjective","Cheerfully carefree and unbothered.","He gave an insouciant shrug and kept eating."],
-    ["Sycophant","SIK-uh-funt","noun","Someone who flatters powerful people to get ahead.","The boss was surrounded by sycophants."]
-  ];
-
-  // Everyday words
-  const EASY = [
-    ["Cozy","KOH-zee","adjective","Warm, comfy and relaxing.","Rainy days are perfect for a cozy blanket and a movie."],
-    ["Curious","KYUR-ee-us","adjective","Wanting to know or learn more about something.","The curious cat sniffed every box in the room."],
-    ["Grateful","GRAYT-ful","adjective","Thankful for something you have or something someone did.","I'm grateful for friends who show up when it matters."],
-    ["Awkward","AWK-werd","adjective","Uncomfortable or clumsy, especially around other people.","There was an awkward silence after his joke."],
-    ["Brave","BRAYV","adjective","Willing to do something even though it's scary.","It was brave of her to sing on stage alone."],
-    ["Hilarious","hih-LAIR-ee-us","adjective","Extremely funny.","The video of the dog on a skateboard was hilarious."],
-    ["Generous","JEN-er-us","adjective","Happy to give or share more than you have to.","Our generous neighbor brought over a whole pie."],
-    ["Stubborn","STUB-ern","adjective","Refusing to change your mind.","My stubborn little brother won't eat anything green."],
-    ["Gloomy","GLOO-mee","adjective","Dark and dull, or feeling a bit sad.","The gloomy weather made everyone want to stay inside."],
-    ["Cheerful","CHEER-ful","adjective","Happy and in a good mood.","She's always cheerful, even early in the morning."],
-    ["Clumsy","KLUM-zee","adjective","Often tripping, bumping into or dropping things.","I'm so clumsy I tripped over nothing."],
-    ["Shy","SHY","adjective","Quiet and a little nervous around new people.","He was shy at first but opened up after an hour."],
-    ["Patient","PAY-shunt","adjective","Able to wait calmly without getting upset.","Be patient; the pizza is almost here."],
-    ["Jealous","JEL-us","adjective","Upset because someone has something you want.","I'm a little jealous of your beach vacation."],
-    ["Polite","puh-LITE","adjective","Having good manners and showing respect.","It's polite to say thank you."],
-    ["Messy","MES-ee","adjective","Untidy, with things all over the place.","My desk gets messy by the end of the week."],
-    ["Proud","PROWD","adjective","Feeling good about something you or someone close to you did.","I'm proud of you for finishing the race."],
-    ["Nervous","NUR-vus","adjective","Worried or a little scared about what's coming.","I always get nervous before a job interview."],
-    ["Grumpy","GRUM-pee","adjective","In a cranky, bad mood.","Dad is grumpy until he's had his coffee."],
-    ["Fancy","FAN-see","adjective","Expensive-looking or decorated to impress.","We went to a fancy restaurant with cloth napkins."],
-    ["Sincere","sin-SEER","adjective","Honest; you really mean what you say.","His apology felt sincere."],
-    ["Hesitate","HEZ-ih-tayt","verb","To pause before doing something because you're unsure.","Don't hesitate to ask if you need help."],
-    ["Brainstorm","BRAYN-storm","verb","To come up with lots of ideas quickly, good and bad.","Let's brainstorm names for the new puppy."],
-    ["Errand","AIR-und","noun","A short trip to get something done, like grocery shopping.","I have a few errands to run before lunch."],
-    ["Hobby","HOB-ee","noun","Something you do for fun in your free time.","Her hobby is building model planes."],
-    ["Rumor","ROO-mer","noun","A story people pass around that may not be true.","There's a rumor the office is getting a ping-pong table."],
-    ["Delicious","dih-LISH-us","adjective","Tastes really, really good.","Grandma's soup is delicious."],
-    ["Bored","BORD","adjective","Restless because nothing interesting is happening.","I was so bored I counted the ceiling tiles."]
-  ];
-
-  // Common talk: everyday phrases and slang
-  const TALK = [
-    ["Break the ice","","phrase","To do or say something that helps people relax and start talking.","He told a funny story to break the ice."],
-    ["On the fence","","phrase","Not able to decide between two choices.","I'm still on the fence about buying a new phone."],
-    ["Piece of cake","","phrase","Something that's very easy to do.","The test was a piece of cake."],
-    ["Hang in there","","phrase","Keep going and don't give up when things are hard.","Hang in there, the weekend is almost here."],
-    ["Call it a day","","phrase","To stop working on something for now.","We've done enough; let's call it a day."],
-    ["Under the weather","","phrase","Feeling a little sick.","I'm staying home; I'm a bit under the weather."],
-    ["Cold feet","","phrase","Getting nervous and wanting to back out of something.","He got cold feet right before the bungee jump."],
-    ["Rain check","","phrase","A way of saying \"not now, but maybe another time.\"","I can't make dinner tonight. Can I take a rain check?"],
-    ["Up in the air","","phrase","Not decided yet.","Our vacation plans are still up in the air."],
-    ["Bite the bullet","","phrase","To finally do something hard that you've been avoiding.","I bit the bullet and booked the dentist."],
-    ["Hit the sack","","phrase","To go to bed.","I'm exhausted; time to hit the sack."],
-    ["Long story short","","phrase","Used to skip the details and get to the point.","Long story short, we missed the flight."],
-    ["No-brainer","","phrase","A choice that's super easy to make.","Free pizza at the meeting? That's a no-brainer."],
-    ["Touch base","","phrase","To check in with someone briefly.","Let's touch base next week about the project."],
-    ["Ballpark figure","","phrase","A rough guess at a number.","Can you give me a ballpark figure for the repairs?"],
-    ["Cut corners","","phrase","To do something the quick or cheap way and skip important steps.","Never cut corners on the brakes."],
-    ["Hit the road","","phrase","To leave or set off on a trip.","Let's hit the road before traffic gets bad."],
-    ["Spot on","","phrase","Exactly right.","Your guess was spot on."],
-    ["Sleep on it","","phrase","To wait until tomorrow before making a decision.","Don't decide now; sleep on it."],
-    ["Wing it","","phrase","To do something without planning or preparing.","I forgot my notes, so I had to wing it."],
-    ["Bucket list","","phrase","A list of things you want to do in your lifetime.","Seeing the northern lights is on my bucket list."],
-    ["The last straw","","phrase","The final small problem that makes you run out of patience.","Losing my umbrella was the last straw."],
-    ["My bad","","slang","A casual way to say \"sorry, my mistake.\"","Oops, I took your seat. My bad!"],
-    ["Low-key","","slang","A little, quietly, or without making a big deal of it.","I'm low-key excited about the new season."],
-    ["Spill the tea","","slang","To share the latest gossip.","You went on the date? Spill the tea!"],
-    ["FOMO","","slang","Short for \"fear of missing out\": worrying that others are having fun without you.","Seeing the party photos gave me major FOMO."],
-    ["Vibe","","slang","The feeling or mood of a place, person or thing.","This café has a really cozy vibe."],
-    ["Go-to","","slang","The thing or person you always pick first.","Tacos are my go-to dinner on busy nights."],
-    ["Hangry","","slang","Cranky because you're hungry.","Feed me before I get hangry."],
-    ["Ghost","","slang","To suddenly stop replying to someone without explaining why.","He ghosted me after our second date."]
-  ];
-
-  // Five example sentences per entry, in the order of TENSES. *Stars* mark the word.
+  // Words come from words.js: [group, word, pronunciation, type, meaning, example, [5 sentences]]
   const TENSES = ["Present", "Past", "Future", "Present continuous", "Present perfect"];
-  const SENTENCES = {
-    "Serendipity": ["Some of my best finds come from pure *serendipity*.","We found that hidden beach by *serendipity*.","Maybe *serendipity* will bring us together again.","*Serendipity* is working in our favor today.","*Serendipity* has led me to some great friends."],
-    "Kerfuffle": ["There's always a *kerfuffle* when the Wi-Fi goes down.","The new seating plan caused a *kerfuffle*.","Changing the menu will cause a *kerfuffle*.","The kids are making a *kerfuffle* over the remote.","That one email has started a huge *kerfuffle*."],
-    "Ephemeral": ["Fame on the internet is often *ephemeral*.","The rainbow was *ephemeral*; it vanished in seconds.","This trend will be *ephemeral*, like most trends.","We're enjoying an *ephemeral* moment of quiet before the kids wake up.","Her success has proven anything but *ephemeral*."],
-    "Petrichor": ["I love the *petrichor* after a summer storm.","The *petrichor* filled the air after the rain stopped.","Once the rain starts, the *petrichor* will drift through the window.","I'm breathing in the *petrichor* on the porch.","The rain has left a wonderful *petrichor* in the air."],
-    "Ubiquitous": ["Coffee shops are *ubiquitous* in this city.","Flip phones were *ubiquitous* in the early 2000s.","Electric cars will soon be *ubiquitous*.","Scooters are becoming *ubiquitous* downtown.","Smartphones have become *ubiquitous*."],
-    "Flabbergasted": ["His magic tricks leave everyone *flabbergasted*.","I was *flabbergasted* by the size of the bill.","You'll be *flabbergasted* when you see the view.","She's still feeling *flabbergasted* about the surprise party.","The news has left the whole town *flabbergasted*."],
-    "Mellifluous": ["The narrator has a *mellifluous* voice.","Her *mellifluous* singing filled the church.","The new radio host will bring a *mellifluous* voice to mornings.","A *mellifluous* melody is playing in the café.","His *mellifluous* tone has made him a popular podcaster."],
-    "Resilient": ["Small businesses are often *resilient*.","The team was *resilient* after losing the first game.","With practice, you'll become more *resilient*.","The town is staying *resilient* after the storm.","These plants have proven *resilient* in the desert heat."],
-    "Quixotic": ["His plans are always a little *quixotic*.","Her *quixotic* dream was to paddle around the world in a canoe.","Running for mayor at 19 will seem *quixotic* to some people.","He's chasing a *quixotic* goal of visiting every country in a year.","Their *quixotic* idea has somehow worked out."],
-    "Lollygag": ["We always *lollygag* at the farmers market.","The kids *lollygagged* on the way home from school.","We'll *lollygag* by the lake all afternoon.","You're *lollygagging* again; the bus leaves in five minutes.","I've *lollygagged* all morning and done nothing."],
-    "Halcyon": ["Those college years feel *halcyon* now.","It was a *halcyon* summer of beach trips and ice cream.","Retirement will be a *halcyon* time for my parents.","We're enjoying a *halcyon* week with no deadlines.","The lake has always been a *halcyon* place for me."],
-    "Luminous": ["The moon looks *luminous* tonight.","Her smile was *luminous* in the old photo.","The city will look *luminous* once the lights come on.","*Luminous* fireflies are dancing over the yard.","The paint has stayed *luminous* for years."],
-    "Candor": ["I value *candor* in a friend.","She answered with surprising *candor*.","The coach will speak with *candor* about the loss.","He's showing real *candor* about his mistakes.","Her *candor* has earned everyone's trust."],
-    "Gobbledygook": ["Tech manuals often sound like *gobbledygook*.","The lawyer's letter was pure *gobbledygook*.","Without a glossary, this report will read like *gobbledygook*.","The speaker is talking *gobbledygook* again.","The new tax form has turned into total *gobbledygook*."],
-    "Wanderlust": ["Travel photos give me *wanderlust*.","Her *wanderlust* took her to 30 countries.","Your *wanderlust* will kick in once you see Iceland.","I'm feeling serious *wanderlust* this winter.","*Wanderlust* has kept him on the road for years."],
-    "Eloquent": ["She is always *eloquent* in meetings.","His toast at the wedding was *eloquent*.","With practice, your speeches will become more *eloquent*.","The student is giving an *eloquent* talk about the ocean.","The author has written an *eloquent* letter to her readers."],
-    "Pragmatic": ["My dad takes a *pragmatic* approach to money.","We made a *pragmatic* choice and rented instead of buying.","The new manager will be more *pragmatic* about deadlines.","We're being *pragmatic* and fixing the roof first.","She has always been *pragmatic* about her career."],
-    "Brouhaha": ["Every new rule brings a *brouhaha* online.","The referee's call caused a *brouhaha* in the stands.","The price increase will start a *brouhaha*.","A *brouhaha* is brewing at the city council meeting.","The celebrity's post has caused quite a *brouhaha*."],
-    "Nostalgia": ["This song fills me with *nostalgia*.","Looking at old photos brought a wave of *nostalgia*.","One day you'll feel *nostalgia* for these crazy years.","I'm feeling *nostalgia* for my hometown.","*Nostalgia* has made vinyl records popular again."],
-    "Tenacious": ["Good reporters are *tenacious*.","The *tenacious* climber reached the summit on her third try.","You'll need to be *tenacious* to finish this marathon.","The *tenacious* weeds are taking over the garden again.","He has been *tenacious* about learning Spanish."],
-    "Benevolent": ["Our landlord is *benevolent* about late rent.","A *benevolent* stranger paid for our coffee.","The new owner will be a *benevolent* boss, I hope.","A *benevolent* group is handing out free meals today.","Our *benevolent* manager has given everyone Friday off."],
-    "Discombobulated": ["Daylight saving time always leaves me *discombobulated*.","I felt *discombobulated* after the long flight.","You'll be *discombobulated* for a day after the time change.","I'm feeling *discombobulated* after that spinning ride.","The power cut has left everyone *discombobulated*."],
-    "Lethargic": ["I feel *lethargic* after a big lunch.","The dog was *lethargic* all afternoon in the heat.","Without sleep, you'll feel *lethargic* tomorrow.","The whole office is feeling *lethargic* today.","I've been *lethargic* ever since Thanksgiving dinner."],
-    "Gregarious": ["My aunt is *gregarious* and loves a full house.","He was the most *gregarious* kid in class.","The new puppy will be *gregarious* with everyone it meets.","She's being extra *gregarious* at the party tonight.","Dolphins have always been *gregarious* animals."],
-    "Meticulous": ["She is *meticulous* about her notes.","The chef was *meticulous* with every plate.","The inspector will be *meticulous* with the paperwork.","He's being *meticulous* about packing for the trip.","They have kept *meticulous* records for ten years."],
-    "Defenestration": ["My printer is one paper jam away from *defenestration*.","Our history class learned about the famous *defenestration* of Prague.","If this phone freezes again, *defenestration* will follow.","I'm seriously considering the *defenestration* of my alarm clock.","That old laptop has narrowly escaped *defenestration* many times."],
-    "Ambivalent": ["I'm *ambivalent* about winter.","She was *ambivalent* about the job offer.","You'll probably feel *ambivalent* on your last day of school.","He's feeling *ambivalent* about selling his car.","I've always been *ambivalent* about horror movies."],
-    "Euphoria": ["Winning a game brings pure *euphoria*.","The fans danced in *euphoria* after the final goal.","There will be *euphoria* in the streets if we win.","The whole team is riding a wave of *euphoria*.","The good news has filled the office with *euphoria*."],
-    "Cacophony": ["Rush hour is a *cacophony* of horns.","The kindergarten concert was a lovely *cacophony*.","The construction next door will be a *cacophony* all week.","A *cacophony* of birds is waking up the whole street.","The new neighbors have brought a *cacophony* of barking dogs."],
-    "Facetious": ["He is often *facetious* in serious meetings.","Her *facetious* comment made the teacher frown.","I'll stop being *facetious* during the interview, I promise.","Are you being *facetious* or serious right now?","He has made one too many *facetious* remarks today."],
-    "Sanguine": ["She is *sanguine* about the team's chances.","The coach was *sanguine* about the new season.","Investors will be *sanguine* if sales keep growing.","We're staying *sanguine* despite the rain forecast.","He has remained *sanguine* through every setback."],
-    "Ineffable": ["The joy of a first snow is *ineffable*.","The northern lights were *ineffable*.","Seeing the Grand Canyon at sunrise will be *ineffable*.","I'm feeling an *ineffable* sense of peace by the ocean.","Music has always had an *ineffable* power over me."],
-    "Zealous": ["The new volunteers are very *zealous*.","The *zealous* referee gave out ten yellow cards.","The new teacher will be *zealous* about homework.","He's being a little too *zealous* about recycling.","She has been a *zealous* supporter of the library for years."],
-    "Lackadaisical": ["His *lackadaisical* attitude drives his coach crazy.","The service at the restaurant was *lackadaisical*.","A *lackadaisical* effort won't win the championship.","The team is playing in a *lackadaisical* way today.","He has been *lackadaisical* about his chores all week."],
-    "Paradox": ["It's a *paradox* that more choices can make us less happy.","The time travel movie created a confusing *paradox*.","This plan will create a *paradox* we can't solve.","We're facing a strange *paradox*: more money, less time.","Philosophers have debated this *paradox* for centuries."],
-    "Ethereal": ["Her voice sounds *ethereal* in the big hall.","The morning mist looked *ethereal* over the lake.","The lanterns will give the garden an *ethereal* glow.","Soft music is creating an *ethereal* mood in the spa.","The photographer has captured the *ethereal* beauty of the desert."],
-    "Hubris": ["*Hubris* is the downfall of many heroes in Greek myths.","His *hubris* cost him the championship.","Their *hubris* will lead to a big mistake.","The company is showing a lot of *hubris* by ignoring complaints.","*Hubris* has ruined more than one great leader."],
-    "Conundrum": ["Choosing a gift for my brother is always a *conundrum*.","The broken lock was a real *conundrum*.","Fitting everything in the car will be a *conundrum*.","We're facing a *conundrum* about where to live.","This riddle has been a *conundrum* for years."],
-    "Ebullient": ["My grandma is *ebullient* at every family party.","The *ebullient* crowd cheered for twenty minutes.","The kids will be *ebullient* on the first day of summer.","She's feeling *ebullient* after getting the job.","He has been *ebullient* ever since he got engaged."],
-    "Procrastinate": ["I *procrastinate* when I'm tired.","I *procrastinated* on my taxes until April.","I'll *procrastinate* all day if I stay on my phone.","I'm *procrastinating* right now by reading this card.","She has *procrastinated* on that report for weeks."],
-    "Vicarious": ["I get *vicarious* thrills from skydiving videos.","We enjoyed a *vicarious* vacation through her photos.","You'll feel *vicarious* pride when your kids graduate.","I'm living a *vicarious* life through my traveling friends.","Reality TV has given millions of people a *vicarious* escape."],
-    "Fortuitous": ["Rain on a hot day is always *fortuitous*.","Our meeting at the airport was *fortuitous*.","A *fortuitous* opening will come up; just be ready.","Things are taking a *fortuitous* turn for the team.","That *fortuitous* phone call has changed my career."],
-    "Ostentatious": ["His house is a little *ostentatious*.","She wore an *ostentatious* hat to the races.","The new hotel lobby will be *ostentatious*, with gold everywhere.","They're throwing an *ostentatious* party for their dog.","The billionaire has bought another *ostentatious* yacht."],
-    "Pensive": ["He gets *pensive* on long drives.","She looked *pensive* after reading the letter.","You'll feel *pensive* on your last night in Paris.","Grandpa is sitting on the porch, looking *pensive*.","She has been quiet and *pensive* all day."],
-    "Juxtapose": ["The museum *juxtaposes* ancient and modern art.","The director *juxtaposed* happy music with a sad scene.","The designer will *juxtapose* bright colors with plain white walls.","This chef is *juxtaposing* sweet and spicy flavors.","The photographer has *juxtaposed* city life and nature in her book."],
-    "Bamboozle": ["Scammers *bamboozle* people with fake prizes.","My little sister *bamboozled* me into doing her chores.","Don't worry, he won't *bamboozle* you this time.","I think that salesman is *bamboozling* us.","The puzzle has *bamboozled* everyone at the party."],
-    "Effervescent": ["This lemonade is *effervescent* and fresh.","Her *effervescent* laugh filled the room.","The new host will bring an *effervescent* energy to the show.","The kids are feeling *effervescent* on the last day of school.","She has always had an *effervescent* personality."],
-    "Magnanimous": ["A good leader is *magnanimous* in victory.","The winner gave a *magnanimous* speech about her rival.","I'll be *magnanimous* and let you have the last cookie.","He's being *magnanimous* about the scratch on his car.","She has been *magnanimous* toward her old rivals."],
-    "Enigma": ["My cat is an *enigma* to me.","The ship's disappearance was an *enigma*.","How the old statues got there will remain an *enigma*.","This crossword clue is turning into a real *enigma*.","The painting's meaning has been an *enigma* for centuries."],
-    "Placate": ["A cookie usually *placates* my toddler.","The manager *placated* the angry customer with a free meal.","A quick apology will *placate* her.","The airline is *placating* passengers with free snacks.","Nothing has *placated* the neighbors since the party."],
-    "Solace": ["Many people find *solace* in music.","She found *solace* in her garden after the move.","Your friends will be a *solace* during hard times.","I'm finding *solace* in long walks lately.","Books have always been a *solace* for me."],
-    "Verbose": ["His emails are always *verbose*.","The speech was so *verbose* that people fell asleep.","I'll try not to be *verbose* in my presentation.","You're being a bit *verbose*; can you sum it up?","The manual has become more *verbose* with every update."],
-    "Whimsical": ["Her paintings are colorful and *whimsical*.","The wedding had a *whimsical* fairy-tale theme.","The new park will have *whimsical* sculptures.","The kids are building a *whimsical* castle out of boxes.","The bakery has added a *whimsical* unicorn cake to the menu."],
-    "Nincompoop": ["My brother acts like a *nincompoop* around his crush.","I felt like a *nincompoop* when I locked my keys in the car.","Don't worry, no one will think you're a *nincompoop*.","Some *nincompoop* is parking across two spaces again.","I've been a *nincompoop*; I forgot your birthday."],
-    "Nonchalant": ["She is always *nonchalant* before big games.","He gave a *nonchalant* shrug when he won.","I'll act *nonchalant* when they announce the winner.","The cat is acting *nonchalant* after knocking over the vase.","He has stayed *nonchalant* through the whole interview process."],
-    "Labyrinth": ["This airport is a *labyrinth*.","We got lost in the hedge *labyrinth* for an hour.","The new mall will be a *labyrinth* of shops.","We're wandering through a *labyrinth* of old streets.","The tax system has become a *labyrinth* of rules."],
-    "Epiphany": ["I often have an *epiphany* in the shower.","She had an *epiphany* about her career on a hike.","One day you'll have an *epiphany* and it will all make sense.","I think I'm having an *epiphany* about this puzzle.","He has had an *epiphany*: breakfast is the best meal."],
-    "Frugal": ["My grandpa is *frugal* and reuses everything.","We were *frugal* during college.","We'll be *frugal* this month to save for the trip.","I'm being *frugal* and cooking at home this week.","Being *frugal* has helped them pay off their car."],
-    "Ardent": ["He is an *ardent* fan of old movies.","She was an *ardent* reader as a child.","Your kids will become *ardent* fans of this show.","The crowd is giving *ardent* support to the home team.","He has been an *ardent* supporter of animal shelters for years."],
-    "Clandestine": ["The kids hold *clandestine* meetings in the treehouse.","They planned a *clandestine* surprise party for Dad.","We'll have a *clandestine* snack after everyone goes to bed.","Two spies are having a *clandestine* meeting in the park.","The two companies have held *clandestine* talks for months."],
-    "Mundane": ["Laundry is a *mundane* chore.","The meeting was long and *mundane*.","Tomorrow will be a *mundane* day of errands.","I'm doing *mundane* paperwork all afternoon.","Even *mundane* tasks have become fun with this playlist."],
-    "Cattywampus": ["That picture frame always hangs *cattywampus*.","The movers left the couch *cattywampus*.","If you don't measure, the shelf will end up *cattywampus*.","The tent is leaning *cattywampus* in the wind.","The fence has gone *cattywampus* after the storm."],
-    "Audacious": ["Her ideas are bold and *audacious*.","The team made an *audacious* comeback in the last minute.","The company will make an *audacious* bid for the contract.","He's taking an *audacious* risk by quitting his job.","She has set an *audacious* goal of ten marathons this year."],
-    "Respite": ["A cold drink is a welcome *respite* on hot days.","The holiday gave us a short *respite* from work.","The rain will bring some *respite* from the heat.","We're enjoying a brief *respite* while the baby naps.","The cooler weather has given us a nice *respite*."],
-    "Idiosyncrasy": ["Everyone has an *idiosyncrasy* or two.","His strangest *idiosyncrasy* was wearing socks to the beach.","You'll get used to her little *idiosyncrasies*.","My dog is showing a new *idiosyncrasy*: he only drinks from cups.","This old car has developed a few *idiosyncrasies*."],
-    "Panacea": ["A nap isn't a *panacea*, but it helps a lot.","People thought the new law was a *panacea*.","More money won't be a *panacea* for the team's problems.","Some people are treating this app as a *panacea* for stress.","Technology has never been a *panacea* for bad planning."],
-    "Bucolic": ["Their farm is quiet and *bucolic*.","We spent a *bucolic* weekend in the countryside.","The new trail will pass through *bucolic* hills.","We're enjoying a *bucolic* picnic by the river.","The village has kept its *bucolic* charm for centuries."],
-    "Altruism": ["Nurses show *altruism* every day.","Her *altruism* inspired the whole class to volunteer.","Your *altruism* will make a difference in someone's life.","The community is showing great *altruism* after the flood.","His *altruism* has helped hundreds of families."],
-    "Shenanigans": ["My cousins get up to *shenanigans* every holiday.","The *shenanigans* at the sleepover kept everyone up.","There will be no *shenanigans* on this field trip!","What *shenanigans* are you two planning?","The cat has been up to *shenanigans* all night."],
-    "Cogent": ["Her arguments are always *cogent*.","He gave a *cogent* explanation of the problem.","A *cogent* plan will win the investors over.","She's making a *cogent* case for a longer lunch break.","The lawyer has presented a *cogent* argument to the jury."],
-    "Plethora": ["This store has a *plethora* of snacks.","We had a *plethora* of options for dinner.","The festival will offer a *plethora* of food trucks.","The kids are getting a *plethora* of gifts this year.","The internet has given us a *plethora* of information."],
-    "Reverie": ["Rainy afternoons put me in a *reverie*.","The phone ringing broke my *reverie*.","You'll drift into a *reverie* on that beach.","She's lost in a *reverie* about her vacation.","He has been in a *reverie* since the concert."],
-    "Eccentric": ["My uncle is a bit *eccentric*.","The *eccentric* inventor built a robot butler.","Our new neighbor will be the most *eccentric* person on the street, I bet.","He's wearing his most *eccentric* hat today.","She has always had *eccentric* taste in music."],
-    "Penchant": ["I have a *penchant* for old movies.","As a kid, he had a *penchant* for climbing trees.","Your puppy will develop a *penchant* for chewing shoes.","She's showing a *penchant* for painting lately.","He has always had a *penchant* for bad puns."],
-    "Vivacious": ["Our tour guide is *vivacious* and funny.","The *vivacious* host kept the party going.","The new cast will be young and *vivacious*.","She's being extra *vivacious* tonight.","Grandma has stayed *vivacious* well into her nineties."],
-    "Cathartic": ["Writing in a journal is *cathartic*.","Screaming on the roller coaster was *cathartic*.","A long run will be *cathartic* after this week.","Cleaning out the garage is feeling oddly *cathartic*.","Talking it through has been really *cathartic*."],
-    "Insouciant": ["Cats have an *insouciant* way of ignoring you.","He gave an *insouciant* wave and walked off.","She'll stay *insouciant* even if she misses the bus.","He's acting *insouciant* about the exam tomorrow.","The singer has kept her *insouciant* style for decades."],
-    "Sycophant": ["Every king has a *sycophant* or two.","The new intern acted like a total *sycophant*.","The boss will see right through any *sycophant*.","He's being such a *sycophant* to the new manager.","She has surrounded herself with *sycophants*."],
-
-    "Cozy": ["This café is so *cozy*.","The cabin was warm and *cozy*.","A fire will make the room *cozy*.","We're getting *cozy* under a blanket with hot cocoa.","The new rug has made the living room so *cozy*."],
-    "Curious": ["Kids are naturally *curious*.","I was *curious* about the noise outside.","Your guests will be *curious* about this painting.","I'm getting *curious* about what's in that box.","She has always been *curious* about space."],
-    "Grateful": ["I'm *grateful* for my family.","We were *grateful* for the free ride home.","You'll be *grateful* you packed an umbrella.","I'm feeling *grateful* for this sunny day.","He has always been *grateful* to his first coach."],
-    "Awkward": ["Small talk in elevators is *awkward*.","The first date was a little *awkward*.","It will be *awkward* if we both wear the same shirt.","This conversation is getting *awkward*.","Things have been *awkward* between them since the argument."],
-    "Brave": ["Firefighters are *brave*.","She was *brave* at the dentist.","You'll be *brave* on your first day; I know it.","He's being really *brave* about moving to a new school.","The kids have been so *brave* during the storm."],
-    "Hilarious": ["My grandpa's jokes are *hilarious*.","The movie was *hilarious*.","This costume will look *hilarious* on the dog.","The comedian is being *hilarious* tonight.","This has been the most *hilarious* trip ever."],
-    "Generous": ["My aunt is very *generous* with her time.","He was *generous* and paid for everyone's lunch.","The company will be *generous* with bonuses this year.","You're being very *generous* with the cookies.","The town has been *generous* with donations."],
-    "Stubborn": ["My cat is *stubborn* about bath time.","The jar lid was too *stubborn* to open.","He'll be *stubborn* about it, as usual.","You're being *stubborn*; just ask for directions.","This stain has been really *stubborn*."],
-    "Gloomy": ["Winter mornings are *gloomy*.","The sky was *gloomy* all weekend.","Tomorrow will be *gloomy* with light rain.","He's feeling *gloomy* about the test results.","It has been *gloomy* for days."],
-    "Cheerful": ["Our mail carrier is always *cheerful*.","The room was bright and *cheerful*.","Yellow paint will make the kitchen *cheerful*.","Everyone is feeling *cheerful* after the good news.","She has stayed *cheerful* all week."],
-    "Clumsy": ["I'm *clumsy* in the morning.","The *clumsy* waiter dropped a tray of glasses.","You'll feel *clumsy* the first time you ice skate.","I'm being so *clumsy* today.","He has been *clumsy* since he got his new glasses."],
-    "Shy": ["My little cousin is *shy* with new people.","I was *shy* as a kid.","The puppy will be *shy* for the first few days.","He's being *shy* because everyone is watching.","She has never been *shy* about speaking up."],
-    "Patient": ["Good teachers are *patient*.","We were *patient* while the line moved slowly.","You'll need to be *patient* with the new software.","The kids are being very *patient* in the waiting room.","She has been *patient* with her new puppy."],
-    "Jealous": ["My dog gets *jealous* when I pet the cat.","I was *jealous* of my friend's new bike.","Everyone will be *jealous* of your tan.","Are you getting *jealous* of my sandwich?","He has been *jealous* since his brother got a phone."],
-    "Polite": ["It's *polite* to hold the door for others.","The waiter was very *polite*.","The kids will be *polite* at dinner, I promise.","You're being very *polite* today.","He has always been *polite* to his neighbors."],
-    "Messy": ["My room is *messy* again.","The kitchen was *messy* after the party.","Painting with kids will get *messy*.","The car is getting *messy* with all these snacks.","The garage has been *messy* for months."],
-    "Proud": ["I'm *proud* of my little sister.","He was *proud* of his first paycheck.","Your parents will be so *proud* of you.","She's feeling *proud* of her garden this year.","We have always been *proud* of our hometown."],
-    "Nervous": ["I get *nervous* before flights.","She was *nervous* on her first day.","You'll be *nervous*, but you'll do great.","I'm getting *nervous* about the presentation.","He has been *nervous* all week about the big game."],
-    "Grumpy": ["My cat is *grumpy* in the morning.","The bus driver was *grumpy* this morning.","He'll be *grumpy* if he misses his nap.","You're being *grumpy*; did you eat lunch?","Grandpa has been *grumpy* since his team lost."],
-    "Fancy": ["That hotel is too *fancy* for me.","We had a *fancy* dinner for their anniversary.","The wedding will be very *fancy*.","She's wearing a *fancy* dress tonight.","Our little town has gotten *fancy* with new shops."],
-    "Sincere": ["Her thank-you notes are always *sincere*.","His apology was *sincere*.","A *sincere* compliment will make her day.","I think he's being *sincere* this time.","She has been *sincere* about wanting to help."],
-    "Hesitate": ["I *hesitate* before jumping into cold water.","He *hesitated* before answering the question.","She won't *hesitate* to tell you the truth.","Why are you *hesitating*? Just jump!","I have never *hesitated* to help a friend."],
-    "Brainstorm": ["Our team *brainstorms* every Monday.","We *brainstormed* ideas for the party.","We'll *brainstorm* names for the new café tomorrow.","The kids are *brainstorming* costume ideas.","I've *brainstormed* ten ideas, and they're all bad."],
-    "Errand": ["I run *errands* on Saturday mornings.","She ran a quick *errand* to the post office.","I'll do one more *errand* before lunch.","Dad is running *errands* all afternoon.","I've finished every *errand* on my list."],
-    "Hobby": ["Gardening is my favorite *hobby*.","Painting was his *hobby* in college.","Photography will be a great *hobby* for you.","She's picking up a new *hobby*: rock climbing.","Baking has become my weekend *hobby*."],
-    "Rumor": ["*Rumors* spread fast in small towns.","I heard a *rumor* about a new pizza place.","That *rumor* will be everywhere by lunch.","A *rumor* is going around that school starts late tomorrow.","The *rumor* has turned out to be true."],
-    "Delicious": ["Fresh bread is *delicious*.","The tacos last night were *delicious*.","This cake will be *delicious* with whipped cream.","Something *delicious* is cooking in the kitchen.","Every meal on this trip has been *delicious*."],
-    "Bored": ["I get *bored* on long car rides.","The kids were *bored* during the rainy weekend.","You'll be *bored* without your phone.","I'm getting *bored* of this show.","The dog has been *bored* all day."],
-
-    "Break the ice": ["A good joke always *breaks the ice*.","She *broke the ice* by asking about my shoes.","This game will *break the ice* at the party.","The host is *breaking the ice* with a funny story.","The new puppy has *broken the ice* between the neighbors."],
-    "On the fence": ["I'm *on the fence* about the new phone.","She was *on the fence* about the job until yesterday.","He'll stay *on the fence* until the last minute.","We're still sitting *on the fence* about the trip.","I've been *on the fence* about this haircut for weeks."],
-    "Piece of cake": ["Parallel parking is a *piece of cake* for her.","The math homework was a *piece of cake*.","Don't worry, the interview will be a *piece of cake*.","This puzzle is turning out to be a *piece of cake*.","Learning to ride a bike has been a *piece of cake* for him."],
-    "Hang in there": ["I tell myself to *hang in there* every Monday.","She *hung in there* through a tough first year.","We'll *hang in there* until help arrives.","I'm *hanging in there*, thanks for asking.","You've *hung in there* through a lot this year."],
-    "Call it a day": ["We usually *call it a day* around five.","The builders *called it a day* when the rain started.","I'll finish this email and then *call it a day*.","We're *calling it a day*; see you tomorrow!","Most of the team has already *called it a day*."],
-    "Under the weather": ["I often feel *under the weather* when the seasons change.","She was *under the weather* last week.","If you stay out in the cold, you'll be *under the weather* tomorrow.","I'm feeling a bit *under the weather* today.","He has been *under the weather* since Monday."],
-    "Cold feet": ["Lots of people get *cold feet* before a big move.","He got *cold feet* and skipped the audition.","I hope she won't get *cold feet* before the wedding.","I'm getting *cold feet* about the skydiving trip.","The buyer has gotten *cold feet* about the house."],
-    "Rain check": ["I always take a *rain check* when I'm too tired.","She took a *rain check* on our coffee date.","I'll have to take a *rain check* on the game tonight.","I'm taking a *rain check*, but let's go next week.","He has asked for a *rain check* three times now."],
-    "Up in the air": ["Our weekend plans are *up in the air*.","The concert was *up in the air* because of the storm.","The schedule will be *up in the air* until Monday.","The date is staying *up in the air* until the boss decides.","The trip has been *up in the air* for weeks."],
-    "Bite the bullet": ["Sometimes you just have to *bite the bullet*.","I *bit the bullet* and bought a new laptop.","I'll *bite the bullet* and call the landlord tomorrow.","I'm *biting the bullet* and cleaning the garage today.","She has finally *bitten the bullet* and joined a gym."],
-    "Hit the sack": ["I usually *hit the sack* around ten.","We *hit the sack* early after the long hike.","I'll *hit the sack* as soon as this episode ends.","I'm *hitting the sack*. Good night!","The kids have already *hit the sack*."],
-    "Long story short": ["*Long story short*, I always lose my keys.","*Long story short*, we got lost and ended up in another town.","*Long story short*, I won't be at the party.","*Long story short*, I'm moving to Denver.","*Long story short*, I've decided to change jobs."],
-    "No-brainer": ["Wearing sunscreen at the beach is a *no-brainer*.","Taking the free upgrade was a *no-brainer*.","Booking early will be a *no-brainer* if prices go up.","This decision is becoming a *no-brainer*.","Getting a dishwasher has been a *no-brainer* for our family."],
-    "Touch base": ["My manager and I *touch base* every Friday.","We *touched base* after the meeting.","I'll *touch base* with you tomorrow.","I'm just *touching base* to see how the project is going.","Have you *touched base* with the client yet?"],
-    "Ballpark figure": ["The mechanic usually gives a *ballpark figure* first.","She gave us a *ballpark figure* of $500.","I'll send you a *ballpark figure* by tonight.","We're working with a *ballpark figure* for now.","The builder has given us a *ballpark figure* for the kitchen."],
-    "Cut corners": ["Good chefs never *cut corners*.","The builders *cut corners*, and the roof leaked.","We won't *cut corners* on safety.","I think they're *cutting corners* to save money.","The company has *cut corners* on customer service."],
-    "Hit the road": ["We always *hit the road* at sunrise on road trips.","We *hit the road* right after breakfast.","We'll *hit the road* as soon as the car is packed.","We're *hitting the road*; see you next week!","They've already *hit the road* for the beach."],
-    "Spot on": ["Her impressions are always *spot on*.","Your weather guess was *spot on*.","I bet his prediction will be *spot on*.","The new chef is getting the seasoning *spot on*.","Your advice has been *spot on* every time."],
-    "Sleep on it": ["I always *sleep on it* before big purchases.","He *slept on it* and said yes the next morning.","I'll *sleep on it* and let you know tomorrow.","I'm *sleeping on it*; ask me again in the morning.","Have you *slept on it* yet?"],
-    "Wing it": ["He never practices; he just *wings it*.","I forgot my notes, so I *winged it*.","We'll *wing it* and see what happens.","I have no recipe; I'm *winging it*.","She has *winged it* through every exam so far."],
-    "Bucket list": ["Skydiving is on my *bucket list*.","Visiting Japan was at the top of her *bucket list*.","This trip will tick off three things on my *bucket list*.","We're slowly working through our *bucket list*.","He has finally crossed the Grand Canyon off his *bucket list*."],
-    "The last straw": ["For my mom, muddy shoes on the carpet are *the last straw*.","The broken printer was *the last straw*.","One more late bus will be *the last straw*.","This traffic is becoming *the last straw*.","The noise from next door has been *the last straw*."],
-    "My bad": ["He always says *my bad* when he bumps into people.","I said *my bad* and moved my bag off her seat.","She'll just say *my bad* and laugh it off.","You're saying *my bad* a lot today!","I've already said *my bad* three times!"],
-    "Low-key": ["I *low-key* love cheesy movies.","The party was *low-key* fun.","I'll be *low-key* sad when summer ends.","I'm *low-key* hoping it snows tomorrow.","I've been *low-key* obsessed with this song all week."],
-    "Spill the tea": ["My friends always *spill the tea* at brunch.","She *spilled the tea* about the office party.","Come over and I'll *spill the tea*.","Everyone is *spilling the tea* in the group chat.","Has anyone *spilled the tea* about the new couple yet?"],
-    "FOMO": ["I get *FOMO* when I skip parties.","I had serious *FOMO* when they went to the concert without me.","You'll have *FOMO* if you don't come on the trip.","I'm having major *FOMO* looking at their beach photos.","Social media has given a lot of people *FOMO*."],
-    "Vibe": ["I love the *vibe* of this neighborhood.","The concert had an amazing *vibe*.","The new lights will give the room a cozy *vibe*.","We're *vibing* to the music in the car.","This café has had a great *vibe* since it opened."],
-    "Go-to": ["Pizza is my *go-to* comfort food.","That jacket was my *go-to* all winter.","This recipe will be your new *go-to*.","She's becoming everyone's *go-to* for tech help.","This song has been my *go-to* for road trips."],
-    "Hangry": ["I get *hangry* if I skip breakfast.","He was so *hangry* he yelled at the vending machine.","The kids will be *hangry* if dinner is late.","I'm getting *hangry*; let's eat.","She has been *hangry* since the meeting ran through lunch."],
-    "Ghost": ["Some people *ghost* instead of saying no.","My pen pal *ghosted* me after two letters.","Don't worry, I won't *ghost* you.","Is he *ghosting* me, or is his phone dead?","The recruiter has *ghosted* me for two weeks."]
-  };
+  const DATA = Array.isArray(window.WOTD_WORDS) ? window.WOTD_WORDS : [];
+  const HARD = [], EASY = [], TALK = [];
+  const SENTENCES = {};
+  DATA.forEach(r => {
+    if (!Array.isArray(r) || r.length < 7) return;
+    SENTENCES[r[1]] = r[6];
+    (r[0] === "e" ? EASY : r[0] === "t" ? TALK : HARD).push([r[1], r[2], r[3], r[4], r[5]]);
+  });
+  if (!DATA.length){
+    document.getElementById("hint").textContent = "The word list didn't load. Refresh the page to try again.";
+    return;
+  }
 
   // A fresh random order every time the page opens, with hard words, easy words and phrases evenly mixed
   function shuffle(a){
@@ -554,28 +281,12 @@ body{
       .map(x => x.w);
   }
 
-  // Words Claude wrote for this browser on earlier visits come back into the mix
-  const EXTRA_KEY = "wotd-extra";
-  const known = new Set(HARD.concat(EASY, TALK).map(w => w[0].toLowerCase()));
-  let extras = [];
-  try {
-    const saved = JSON.parse(localStorage.getItem(EXTRA_KEY) || "[]");
-    if (Array.isArray(saved)) extras = saved.filter(x =>
-      x && Array.isArray(x.e) && x.e.length === 5 && x.e.every(v => typeof v === "string") &&
-      Array.isArray(x.s) && x.s.length === 5 && !known.has(x.e[0].toLowerCase()));
-  } catch (_) {}
-  extras.forEach(x => { SENTENCES[x.e[0]] = x.s; known.add(x.e[0].toLowerCase()); });
-  const extraEntries = () => extras.map(x => x.e);
-  function saveExtras(){
-    try { localStorage.setItem(EXTRA_KEY, JSON.stringify(extras.slice(-300))); } catch (_) {}
-  }
-
   // The deck keeps growing as you swipe, so it never runs out
-  const WORDS = mixDeck([HARD, EASY, TALK, extraEntries()]);
+  const WORDS = mixDeck([HARD, EASY, TALK]);
   function ensureAhead(upTo){
     while (WORDS.length < upTo + 12){
       const recent = new Set(WORDS.slice(-24).map(w => w[0]));
-      WORDS.push.apply(WORDS, mixDeck([HARD, EASY, TALK, extraEntries()]).filter(w => !recent.has(w[0])));
+      WORDS.push.apply(WORDS, mixDeck([HARD, EASY, TALK]).filter(w => !recent.has(w[0])));
     }
   }
 
@@ -870,7 +581,6 @@ body{
     layout(true);
     syncChrome();
     setTimeout(() => top.remove(), 520);
-    maybeRequestMore();
   }
 
   // ---- Bring the previous card back
@@ -1047,94 +757,6 @@ body{
       g.style.setProperty("--ty", (-tilt.rx * 0.55).toFixed(2) + "px");
     }
     requestAnimationFrame(frame);
-  }
-
-  // ---- Unlimited words: ask Claude for fresh ones while you swipe
-  // Without Claude (not signed in, or permission declined) the built-in words keep cycling instead.
-  const TOPICS = ["food","weather","feelings","work","travel","school","nature","sports","home","friends","money","technology","music","animals","science","city life","shopping","health and fitness","art","the ocean"];
-  const LETTERS = "ABCDEFGHIJKLMNOPRSTUVW";
-  let samplePromise = null;
-  let genBusy = false, genOff = false, genFailures = 0;
-  let insertAt = 0;
-
-  const pick = (arr, n) => shuffle(Array.from(arr)).slice(0, n);
-
-  function buildPrompt(){
-    const avoid = Array.from(known).sort().join(", ");
-    const topics = pick(TOPICS, 2);
-    const letters = pick(LETTERS, 4).join(", ");
-    return [
-      "You write entries for a friendly vocabulary flashcard app.",
-      "Give 8 new entries: 3 interesting or advanced English words, 3 useful everyday words, and 2 common English phrases, idioms or slang.",
-      "Keep everything family-friendly. For variety, some can relate to " + topics[0] + " or " + topics[1] + ", and try words that start with " + letters + ".",
-      "Do not use any of these: " + avoid + ".",
-      "Return only JSON: an array of 8 objects with these keys:",
-      "- \"word\": the word or phrase, first letter capitalized",
-      "- \"say\": a simple pronunciation respelling with the stressed syllable in capitals, like \"ser-un-DIP-uh-tee\"; use \"\" for phrases and slang",
-      "- \"type\": one of noun, verb, adjective, adverb, phrase, slang",
-      "- \"meaning\": the meaning in plain words a 10-year-old understands, under 16 words",
-      "- \"example\": one short, natural example sentence, under 14 words",
-      "- \"sentences\": exactly 5 short sentences (under 15 words each) that use the word, in this order of tenses: present simple, past simple, future with will, present continuous, present perfect. For nouns and adjectives, the tense is the tense of the sentence's verb. Put asterisks around the word as it appears in each sentence, like \"I *procrastinated* all day.\""
-    ].join("\n");
-  }
-
-  function cleanEntry(o){
-    if (!o || typeof o !== "object") return null;
-    const text = v => String(v == null ? "" : v).replace(/\s+/g, " ").trim();
-    let word = text(o.word);
-    if (!word || word.length > 28 || known.has(word.toLowerCase())) return null;
-    word = word.charAt(0).toUpperCase() + word.slice(1);
-    const type = text(o.type).toLowerCase() || "word";
-    const meaning = text(o.meaning), example = text(o.example);
-    const sents = Array.isArray(o.sentences) ? o.sentences.map(text).filter(Boolean) : [];
-    if (!meaning || !example || sents.length < 5) return null;
-    let say = text(o.say);
-    if (type === "phrase" || type === "slang" || word.indexOf(" ") > -1 || say.length > 40) say = "";
-    return { e: [word, say, type.slice(0, 16), meaning.slice(0, 170), example.slice(0, 150)], s: sents.slice(0, 5).map(x => x.slice(0, 170)) };
-  }
-
-  // Slot new words in just past the cards already on screen, every other card
-  function addFresh(items){
-    items.forEach(item => {
-      if (known.has(item.e[0].toLowerCase())) return;
-      known.add(item.e[0].toLowerCase());
-      SENTENCES[item.e[0]] = item.s;
-      extras.push(item);
-      const idx = Math.max(insertAt, pos + DEPTHS);
-      ensureAhead(idx);
-      WORDS.splice(idx, 0, item.e);
-      insertAt = idx + 2;
-    });
-    saveExtras();
-  }
-
-  async function requestMore(){
-    if (genBusy || genOff) return;
-    genBusy = true;
-    try {
-      if (!samplePromise){
-        if (!(window.claude && typeof window.claude.use === "function")){ genOff = true; return; }
-        samplePromise = window.claude.use("sample");
-      }
-      const sample = await samplePromise;
-      if (!sample || typeof sample.json !== "function"){ genOff = true; return; }
-      const value = await sample.json(buildPrompt(), { modelTier: "default", cache: false });
-      const list = Array.isArray(value) ? value : (value && Array.isArray(value.entries) ? value.entries : []);
-      const fresh = list.map(cleanEntry).filter(Boolean);
-      if (fresh.length) { genFailures = 0; addFresh(fresh); }
-      else if (++genFailures >= 2) genOff = true;
-    } catch (err) {
-      const code = err && err.code;
-      if (code === "not_granted") genOff = true;
-      else if (code === "rate_limited"){ genOff = true; setTimeout(() => { genOff = false; }, 120000); }
-      else if (++genFailures >= 2) genOff = true;
-    } finally {
-      genBusy = false;
-    }
-  }
-
-  function maybeRequestMore(){
-    if (insertAt < pos + DEPTHS + 8) requestMore();
   }
 
   // ---- Buttons and keys
