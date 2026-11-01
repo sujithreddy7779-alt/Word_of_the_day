@@ -43,9 +43,16 @@ body{
 
 /* Ambient light behind the glass, tinted by the current card */
 .ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.orb{position:absolute;border-radius:50%;filter:blur(70px);transition:background-color 1.1s ease;will-change:transform}
-.orb.a{width:95vmin;height:95vmin;left:50%;top:48%;margin:-47.5vmin 0 0 -47.5vmin;opacity:.42;animation:drift-a 16s ease-in-out infinite alternate}
-.orb.b{width:60vmin;height:60vmin;right:-18vmin;bottom:-14vmin;opacity:.30;animation:drift-b 21s ease-in-out infinite alternate}
+.orb{position:absolute;will-change:transform}
+.orb.a{width:130vmin;height:130vmin;left:50%;top:48%;margin:-65vmin 0 0 -65vmin;animation:drift-a 16s ease-in-out infinite alternate}
+.orb.b{width:96vmin;height:96vmin;right:-36vmin;bottom:-32vmin;animation:drift-b 21s ease-in-out infinite alternate}
+.glow{
+  position:absolute;inset:0;opacity:0;will-change:opacity;
+  transition:opacity 1s ease;
+  background:radial-gradient(closest-side, rgba(var(--c,0,0,0), .44), rgba(var(--c,0,0,0), .17) 50%, rgba(var(--c,0,0,0), 0) 100%);
+}
+.orb.b .glow{background:radial-gradient(closest-side, rgba(var(--c,0,0,0), .32), rgba(var(--c,0,0,0), .12) 50%, rgba(var(--c,0,0,0), 0) 100%)}
+.glow.on{opacity:1}
 @keyframes drift-a{from{transform:translate3d(-7%,-5%,0) scale(1)}to{transform:translate3d(6%,6%,0) scale(1.08)}}
 @keyframes drift-b{from{transform:translate3d(0,0,0)}to{transform:translate3d(-14%,-10%,0)}}
 
@@ -71,24 +78,16 @@ body{
   position:absolute;left:0;right:0;top:0;bottom:30px;
   perspective:900px;
   transform-origin:50% 50%;
-  transition:transform .55s cubic-bezier(.2,.85,.25,1), opacity .4s ease;
+  transition:transform .5s cubic-bezier(.2,.8,.2,1), opacity .35s ease;
   will-change:transform;
+  contain:layout style;
   cursor:grab;
 }
 .card.dragging{cursor:grabbing}
-/* Frosted blur sits on a flat layer under the tilting glass, inset so the glass always covers it */
-.card::before{
-  content:"";position:absolute;inset:8px;pointer-events:none;
-  border-radius:calc(var(--radius-card) - 6px);
-  -webkit-backdrop-filter:blur(26px) saturate(180%);
-  backdrop-filter:blur(26px) saturate(180%);
-  transition:opacity .2s ease;
-}
-.card.turning::before,.card:not(.is-top)::before{opacity:0}
 .card[data-ink="dark"]{--ink:#000000;--ink-soft:rgba(0,0,0,.66);--chip:rgba(0,0,0,.11);--chip-line:rgba(0,0,0,.14);--rule:rgba(0,0,0,.14)}
 .card[data-ink="light"]{--ink:#ffffff;--ink-soft:rgba(255,255,255,.8);--chip:rgba(255,255,255,.17);--chip-line:rgba(255,255,255,.24);--rule:rgba(255,255,255,.22)}
 
-.glass{position:absolute;inset:0;perspective:1400px;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+.glass{position:absolute;inset:0;perspective:1400px;transform:rotateX(0deg) rotateY(0deg);will-change:transform}
 .flipper{position:absolute;inset:0;-webkit-transform-style:preserve-3d;transform-style:preserve-3d;transform:rotateX(0deg)}
 .face{
   position:absolute;inset:0;
@@ -96,7 +95,10 @@ body{
   overflow:hidden;
   color:var(--ink);
   -webkit-backface-visibility:hidden;backface-visibility:hidden;
-  background:linear-gradient(155deg, rgba(var(--rgb), .95) 0%, rgba(var(--rgb), .80) 52%, rgba(var(--rgb), .88) 100%);
+  /* Glass tint over a dark backing, so cards behind never show through as outlines */
+  background:
+    linear-gradient(155deg, rgba(var(--rgb), .96) 0%, rgba(var(--rgb), .85) 52%, rgba(var(--rgb), .91) 100%),
+    linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72));
   border:1px solid rgba(255,255,255,.42);
   box-shadow:
     inset 0 1.5px 0 rgba(255,255,255,.7),
@@ -105,32 +107,34 @@ body{
     inset 0 -60px 90px -40px rgba(0,0,0,.22),
     0 44px 90px -30px rgba(var(--rgb), .6),
     0 22px 44px -14px rgba(0,0,0,.85);
-  transition:border-color .4s ease, box-shadow .4s ease;
 }
 .face.front{transform:rotateX(0deg)}
 .face.back{
   transform:rotateX(180deg);
-  background:linear-gradient(25deg, rgba(var(--rgb), .95) 0%, rgba(var(--rgb), .82) 50%, rgba(var(--rgb), .9) 100%);
+  background:
+    linear-gradient(25deg, rgba(var(--rgb), .96) 0%, rgba(var(--rgb), .86) 50%, rgba(var(--rgb), .92) 100%),
+    linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.72));
 }
 .sheen{
-  position:absolute;inset:0;pointer-events:none;opacity:.55;
-  background:
-    radial-gradient(110% 70% at var(--mx,30%) var(--my,0%), rgba(255,255,255,.5), rgba(255,255,255,0) 50%),
-    linear-gradient(118deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.10) 44%, rgba(255,255,255,0) 56%);
+  position:absolute;left:-40%;top:-60%;width:180%;height:180%;pointer-events:none;opacity:.55;
+  background:radial-gradient(closest-side, rgba(255,255,255,.5), rgba(255,255,255,.2) 32%, rgba(255,255,255,0) 60%);
+  will-change:transform;
 }
-.face::after{
-  content:"";position:absolute;inset:0;pointer-events:none;opacity:.06;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+.face::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(118deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.055) 44%, rgba(255,255,255,0) 56%);
 }
-.card:not(.is-top) .face{border-color:rgba(255,255,255,.16);box-shadow:0 22px 44px -14px rgba(0,0,0,.85)}
+.card:not(.is-top) .face{border-color:transparent;box-shadow:none}
 .card:not(.is-top) .sheen{opacity:0}
+/* The five-tense side is only drawn while it's in use */
+.face.back{visibility:hidden}
+.card.back-on .face.back{visibility:visible}
 
 .content{
   position:relative;z-index:1;height:100%;
   display:flex;flex-direction:column;
   padding:24px 26px 22px;
-  transform:translate3d(var(--tx,0px), var(--ty,0px), 0);
-  transition:opacity .35s ease;
+  transition:opacity .3s ease;
 }
 .card:not(.is-top) .content{opacity:0}
 
@@ -193,7 +197,6 @@ body{
   width:52px;height:52px;border-radius:50%;
   display:grid;place-items:center;color:var(--text);
   background:var(--chrome);border:1px solid var(--chrome-line);
-  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
   cursor:pointer;touch-action:manipulation;
   transition:transform .15s ease, opacity .2s ease, background-color .2s ease;
@@ -216,8 +219,8 @@ body{
 </head>
 <body>
 <div class="ambient" aria-hidden="true">
-  <div class="orb a" id="orbA"></div>
-  <div class="orb b" id="orbB"></div>
+  <div class="orb a" id="orbA"><div class="glow"></div><div class="glow"></div></div>
+  <div class="orb b" id="orbB"><div class="glow"></div><div class="glow"></div></div>
 </div>
 
 <div class="app">
@@ -410,6 +413,11 @@ body{
     flipper.append(front, back);
     glass.appendChild(flipper);
     card.appendChild(glass);
+    card._glass = glass;
+    card._flipper = flipper;
+    card._front = front;
+    card._back = back;
+    card._sheens = [front.firstChild, back.firstChild];
     return card;
   }
 
@@ -465,17 +473,22 @@ body{
   }
 
   // ---- Stack layout
+  // Everything that moves is moved with transform/opacity only, and sizes are measured once,
+  // so the browser never has to redo layout in the middle of a swipe.
   let pos = 0;          // how far into this session's deck the top card is
   let cards = [];       // index 0 is the top card
   const DEPTHS = 4;     // 3 visible + 1 waiting behind
+  let cardW = 340, cardH = 520;
 
-  function cardHeight(){ return cards[0] ? cards[0].offsetHeight : deck.clientHeight - 30; }
+  function measure(){
+    const c = cards[0];
+    if (c){ cardW = c.offsetWidth || cardW; cardH = c.offsetHeight || cardH; }
+  }
 
   function depthTransform(d){
-    const H = cardHeight();
     const s = 1 - 0.055 * d;
-    const y = (H / 2) * (1 - s) + 13 * d;
-    return "translate(0," + y.toFixed(2) + "px) scale(" + s.toFixed(4) + ")";
+    const y = (cardH / 2) * (1 - s) + 13 * d;
+    return "translate3d(0," + y.toFixed(2) + "px,0) scale(" + s.toFixed(4) + ")";
   }
   function depthOpacity(d){
     if (d <= 1) return 1;
@@ -483,20 +496,39 @@ body{
     return Math.max(0, 0.65 - (d - 2) * 0.65);
   }
 
-  function layout(animate, progress){
-    progress = progress || 0;
+  // Which card is on top (only touched when the stack changes, never during a drag)
+  function assignRoles(){
     cards.forEach((c, i) => {
       c.style.zIndex = String(100 - i);
-      c.classList.toggle("is-top", i === 0);
-      c.inert = i !== 0;
-      c.setAttribute("aria-hidden", i === 0 ? "false" : "true");
-      if (i === 0 && (drag || progress)) return;
-      const d = Math.max(0, i - progress);
-      c.style.transition = animate ? "" : "none";
-      c.style.transform = depthTransform(d);
-      c.style.opacity = String(depthOpacity(d));
+      const top = i === 0;
+      if (c._role !== top){
+        c._role = top;
+        c.classList.toggle("is-top", top);
+        c.inert = !top;
+        c.setAttribute("aria-hidden", top ? "false" : "true");
+      }
     });
   }
+
+  function placeStack(animate){
+    cards.forEach((c, i) => {
+      if (i === 0 && drag) return;
+      c.style.transition = animate ? "" : "none";
+      c.style.transform = depthTransform(i);
+      c.style.opacity = String(depthOpacity(i));
+    });
+  }
+
+  // While dragging, the cards behind slide up a little to follow your finger
+  function placeBehind(progress){
+    for (let i = 1; i < cards.length; i++){
+      const d = i - progress;
+      cards[i].style.transform = depthTransform(d);
+      cards[i].style.opacity = String(depthOpacity(d));
+    }
+  }
+
+  function layout(animate){ assignRoles(); placeStack(animate); }
 
   const isFlipped = () => !!(cards[0] && cards[0]._flip === 180);
 
@@ -505,35 +537,52 @@ body{
     else hint.textContent = fineHover ? "Drag the card or press ← → for the next word" : "Swipe left or right for the next word";
   }
 
-  function syncChrome(){
-    const top = cards[0], next = cards[1];
-    if (top) orbA.style.backgroundColor = top.dataset.color;
-    if (next) orbB.style.backgroundColor = next.dataset.color;
+  // Background glow: fade between two pre-drawn layers instead of repainting
+  function setGlow(orb, hex){
+    if (!orb || !hex || orb._hex === hex) return;
+    orb._hex = hex;
+    const a = orb.children[0], b = orb.children[1];
+    const next = a.classList.contains("on") ? b : a;
+    const prev = next === a ? b : a;
+    next.style.setProperty("--c", hexToRgb(hex).join(","));
+    next.classList.add("on");
+    prev.classList.remove("on");
+  }
+  let glowTimer = 0;
+  function syncGlow(){
+    if (cards[0]) setGlow(orbA, cards[0].dataset.color);
+    if (cards[1]) setGlow(orbB, cards[1].dataset.color);
+  }
+
+  function syncChrome(deferGlow){
     backBtn.disabled = pos === 0;
-    if (top){
+    if (cards[0]){
       const w = entryFor(pos).w;
       live.textContent = w[0] + ", " + w[2] + ". " + w[3];
     }
     updateHint();
+    clearTimeout(glowTimer);
+    if (deferGlow) glowTimer = setTimeout(syncGlow, 160);
+    else syncGlow();
   }
 
   // ---- Flip to the five-tense side and back
-  function setFlip(card, angle, animate){
+  function setFlip(card, angle, animate, ms){
     card._flip = angle;
-    const f = card.querySelector(".flipper");
-    f.style.transition = animate
-      ? (reduceMotion.matches ? "transform .25s ease" : "transform .7s cubic-bezier(.22,.9,.24,1.06)")
-      : "none";
-    f.style.transform = "rotateX(" + angle + "deg)";
     const showBack = angle === 180;
-    const front = card.querySelector(".front"), back = card.querySelector(".back");
-    front.inert = showBack;
-    back.inert = !showBack;
-    front.setAttribute("aria-hidden", String(showBack));
-    back.setAttribute("aria-hidden", String(!showBack));
-    card.classList.add("turning");
-    clearTimeout(card._turnTimer);
-    card._turnTimer = setTimeout(() => card.classList.remove("turning"), animate ? 720 : 0);
+    const f = card._flipper;
+    const dur = reduceMotion.matches ? 250 : (ms || 650);
+    if (showBack) card.classList.add("back-on");
+    f.style.transition = animate ? "transform " + dur + "ms cubic-bezier(.2,.85,.25,1.04)" : "none";
+    f.style.transform = "rotateX(" + angle + "deg)";
+    card._front.inert = showBack;
+    card._back.inert = !showBack;
+    card._front.setAttribute("aria-hidden", String(showBack));
+    card._back.setAttribute("aria-hidden", String(!showBack));
+    clearTimeout(card._backTimer);
+    if (!showBack){
+      card._backTimer = setTimeout(() => { if (!card._flip) card.classList.remove("back-on"); }, animate ? dur + 60 : 0);
+    }
     if (card === cards[0]){
       updateHint();
       if (animate){
@@ -543,80 +592,129 @@ body{
     }
   }
 
+  // ---- Building cards (done ahead of time, never in the middle of an animation)
+  function newCard(offset){
+    const c = makeCard(offset);
+    c.style.transition = "none";
+    c.style.opacity = "0";
+    c.style.transform = depthTransform(DEPTHS);
+    deck.appendChild(c);
+    fitCard(c);
+    return c;
+  }
+
   function build(){
     deck.textContent = "";
     cards = [];
-    for (let i = 0; i < DEPTHS; i++){
-      const c = makeCard(pos + i);
-      deck.appendChild(c);
-      cards.push(c);
-    }
-    cards.forEach(fitCard);
+    for (let i = 0; i < DEPTHS; i++) cards.push(newCard(pos + i));
+    measure();
     layout(false);
-    syncChrome();
+    syncChrome(false);
   }
 
-  function addToBack(){
-    const c = makeCard(pos + cards.length);
-    c.style.transition = "none";
-    c.style.opacity = "0";
-    deck.appendChild(c);
-    fitCard(c);
-    cards.push(c);
-    c.style.transform = depthTransform(cards.length - 1);
-    void c.offsetWidth;
+  let refillTimer = 0;
+  function refill(){
+    refillTimer = 0;
+    if (drag){ refillTimer = setTimeout(refill, 120); return; }
+    let added = false;
+    while (cards.length < DEPTHS){ cards.push(newCard(pos + cards.length)); added = true; }
+    if (added) layout(true);
+  }
+  function scheduleRefill(ms){
+    if (!refillTimer) refillTimer = setTimeout(refill, ms);
   }
 
   // ---- Swipe the top card away (either direction shows the next word)
-  function dismiss(dir, fromDy, vy){
+  // The card keeps the speed your finger had when you let go.
+  function dismiss(dir, o){
+    o = o || {};
     const top = cards[0];
     if (!top || top._flip) return;
     const W = window.innerWidth;
-    const ty = (fromDy || 0) * 0.3 + clamp((vy || 0) * 140, -160, 160);
+    const fromX = o.dx || 0;
+    const endX = dir * (W + cardW * 0.6 + 80);
+    const dist = Math.abs(endX - fromX);
+    const v = Math.abs(o.vx || 0);
+    // This curve starts at 3x its average speed, so 3 * distance / speed matches the finger
+    let T = v > 0.15 ? (3 * dist) / v : 420;
+    T = Math.round(clamp(T, 220, 460));
+    if (reduceMotion.matches) T = 200;
+    const fromY = (o.dy || 0) * 0.3;
+    const endY = fromY + clamp((o.vy || 0) * T * 0.3, -180, 180);
+
+    top._role = null;
     top.classList.remove("dragging");
     top.classList.add("leaving");
     top.inert = true;
     top.setAttribute("aria-hidden", "true");
     top.style.zIndex = "300";
-    top.style.transition = reduceMotion.matches
-      ? "transform .25s ease, opacity .25s ease"
-      : "transform .46s cubic-bezier(.3,.6,.35,1), opacity .46s ease";
-    top.style.transform = "translate3d(" + (dir * (W * 1.05 + 220)) + "px," + ty.toFixed(1) + "px,0) rotate(" + (dir * 22) + "deg) rotateY(" + (dir * 34) + "deg)";
-    top.style.opacity = "0.9";
+    top.style.transition = "transform " + T + "ms cubic-bezier(.25,.75,.5,1)";
+    top.style.transform = "translate3d(" + endX.toFixed(1) + "px," + endY.toFixed(1) + "px,0) rotate(" + (dir * 24) + "deg) rotateY(" + (dir * 30) + "deg)";
+
     cards.shift();
     pos += 1;
-    addToBack();
+    if (cards.length < 2) refill();
     layout(true);
-    syncChrome();
-    setTimeout(() => top.remove(), 520);
+    syncChrome(true);
+    setTimeout(() => top.remove(), T + 80);
+    scheduleRefill(Math.max(T, 500) + 60);
   }
 
   // ---- Bring the previous card back
   function rewind(){
-    if (pos === 0) return;
+    if (pos === 0 || drag) return;
     if (cards[0] && cards[0]._flip) setFlip(cards[0], 0, false);
     pos -= 1;
     const c = makeCard(pos);
     const W = window.innerWidth;
     c.style.transition = "none";
     c.style.zIndex = "300";
-    c.style.transform = "translate3d(" + (-(W * 1.05 + 220)) + "px,0,0) rotate(-22deg) rotateY(-34deg)";
+    c.style.transform = "translate3d(" + (-(W + cardW * 0.6 + 80)) + "px,0,0) rotate(-24deg) rotateY(-30deg)";
     deck.appendChild(c);
     fitCard(c);
     cards.unshift(c);
     void c.offsetWidth;
     while (cards.length > DEPTHS){ cards.pop().remove(); }
     layout(true);
-    syncChrome();
+    syncChrome(true);
   }
 
   // ---- Gestures: left/right for the next word, up/down to flip
-  let drag = null;
+  // Pointer events only record where the finger is; the screen is updated once per frame.
+  let drag = null, dragFrame = 0;
 
   function dragTransform(dx, dy){
     const rz = clamp(dx * 0.055, -18, 18);
     const ry = clamp(dx * 0.07, -26, 26);
     return "translate3d(" + dx.toFixed(1) + "px," + (dy * 0.3).toFixed(1) + "px,0) rotate(" + rz.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg)";
+  }
+
+  function flipAngle(d){
+    let a = d.startFlip - (d.dy / (cardH * 0.75)) * 180;
+    if (a < 0) a = -Math.min(12, -a * 0.25);
+    else if (a > 180) a = 180 + Math.min(12, (a - 180) * 0.25);
+    return a;
+  }
+
+  function renderDrag(){
+    dragFrame = 0;
+    const d = drag;
+    if (!d) return;
+    if (d.axis === "x"){
+      d.card.style.transform = dragTransform(d.dx, d.dy);
+      placeBehind(clamp(Math.abs(d.dx) / (cardW * 0.9), 0, 1) * 0.6);
+    } else if (d.axis === "y"){
+      d.card._flipper.style.transform = "rotateX(" + d.angle.toFixed(2) + "deg)";
+    }
+  }
+
+  function velocity(d){
+    const now = performance.now();
+    const pts = d.hist.filter(p => now - p.t < 100);
+    if (pts.length < 2) return { vx: 0, vy: 0 };
+    const a = pts[0], b = pts[pts.length - 1];
+    const dt = Math.max(8, b.t - a.t);
+    return { vx: (b.x - a.x) / dt, vy: (b.y - a.y) / dt };
   }
 
   deck.addEventListener("pointerdown", e => {
@@ -625,19 +723,16 @@ body{
     if (e.target.closest("button")) return;
     if (e.target.closest(".card") !== top) return;
     const rect = top.getBoundingClientRect();
-    const t = performance.now();
     drag = {
       id: e.pointerId, card: top, x0: e.clientX, y0: e.clientY, dx: 0, dy: 0, axis: null,
-      H: top.offsetHeight || 500, startFlip: top._flip || 0, angle: top._flip || 0,
-      px: clamp((e.clientX - rect.left) / rect.width, 0, 1),
-      py: clamp((e.clientY - rect.top) / rect.height, 0, 1),
-      hist: [{ x: e.clientX, y: e.clientY, t }]
+      startFlip: top._flip || 0, angle: top._flip || 0,
+      hist: [{ x: e.clientX, y: e.clientY, t: performance.now() }]
     };
     try { top.setPointerCapture(e.pointerId); } catch (_) {}
     top.classList.add("dragging");
-    top.style.transition = "transform .12s ease-out";
-    top.style.transform = depthTransform(0) + " scale(.985)";
-    pointerTilt = tiltFromPoint(drag.px, drag.py, 1.2);
+    pointerTilt = tiltFromPoint(
+      clamp((e.clientX - rect.left) / rect.width, 0, 1),
+      clamp((e.clientY - rect.top) / rect.height, 0, 1), 1.2);
   });
 
   deck.addEventListener("pointermove", e => {
@@ -647,31 +742,23 @@ body{
       d.dy = e.clientY - d.y0;
       const t = performance.now();
       d.hist.push({ x: e.clientX, y: e.clientY, t });
-      while (d.hist.length > 2 && t - d.hist[0].t > 120) d.hist.shift();
+      if (d.hist.length > 12) d.hist.shift();
 
       if (!d.axis){
-        if (Math.hypot(d.dx, d.dy) < 8) return;
+        if (Math.abs(d.dx) < 6 && Math.abs(d.dy) < 6) return;
         // Vertical drags flip the card; sideways drags only work on the word side
         d.axis = Math.abs(d.dy) > Math.abs(d.dx) ? "y" : (d.startFlip ? "none" : "x");
-        if (d.axis === "y"){
-          d.card.classList.add("turning");
-          clearTimeout(d.card._turnTimer);
-          d.card.querySelector(".flipper").style.transition = "none";
+        if (d.axis === "x"){
+          d.card.style.transition = "none";
+          for (let i = 1; i < cards.length; i++) cards[i].style.transition = "none";
+        } else if (d.axis === "y"){
+          d.card.classList.add("back-on");
+          clearTimeout(d.card._backTimer);
+          d.card._flipper.style.transition = "none";
         }
       }
-
-      if (d.axis === "x"){
-        d.card.style.transition = "none";
-        d.card.style.transform = dragTransform(d.dx, d.dy);
-        const progress = clamp(Math.abs(d.dx) / ((d.card.offsetWidth || 300) * 0.9), 0, 1) * 0.6;
-        layout(false, progress);
-      } else if (d.axis === "y"){
-        let a = d.startFlip - (d.dy / (d.H * 0.75)) * 180;
-        if (a < 0) a = -Math.min(12, -a * 0.25);
-        else if (a > 180) a = 180 + Math.min(12, (a - 180) * 0.25);
-        d.angle = a;
-        d.card.querySelector(".flipper").style.transform = "rotateX(" + a.toFixed(2) + "deg)";
-      }
+      if (d.axis === "y") d.angle = flipAngle(d);
+      if (d.axis && !dragFrame) dragFrame = requestAnimationFrame(renderDrag);
       return;
     }
     // Mouse hover tilt on computers
@@ -687,39 +774,38 @@ body{
     const d = drag;
     drag = null;
     pointerTilt = null;
+    if (dragFrame){ cancelAnimationFrame(dragFrame); dragFrame = 0; }
     d.card.classList.remove("dragging");
-    const first = d.hist[0], last = d.hist[d.hist.length - 1];
-    const dt = Math.max(1, last.t - first.t);
-    const vx = (last.x - first.x) / dt;
-    const vy = (last.y - first.y) / dt;
-
-    const springBack = () => {
-      d.card.style.transition = reduceMotion.matches ? "transform .2s ease" : "transform .6s cubic-bezier(.18,1.4,.4,1)";
-      d.card.style.transform = depthTransform(0);
-      layout(true);
-    };
+    const { vx, vy } = velocity(d);
 
     if (d.axis === "x" && !cancelled){
-      const w = d.card.offsetWidth || 300;
-      const far = Math.abs(d.dx) > w * 0.3;
-      const flick = Math.abs(vx) > 0.45 && Math.abs(d.dx) > 24;
+      const far = Math.abs(d.dx) > cardW * 0.3;
+      const flick = Math.abs(vx) > 0.4 && Math.abs(d.dx) > 20 && Math.sign(vx) === Math.sign(d.dx);
       if (far || flick){
-        dismiss((flick ? Math.sign(vx) : Math.sign(d.dx)) || 1, d.dy, vy);
+        dismiss(Math.sign(d.dx) || 1, { dx: d.dx, dy: d.dy, vx, vy });
         return;
       }
     }
     if (d.axis === "y"){
       let target = d.startFlip;
       if (!cancelled){
-        if (d.startFlip === 0) target = (d.angle > 70 || (vy < -0.35 && d.dy < -20)) ? 180 : 0;
-        else target = (d.angle < 110 || (vy > 0.35 && d.dy > 20)) ? 0 : 180;
+        if (d.startFlip === 0) target = (d.angle > 70 || (vy < -0.3 && d.dy < -16)) ? 180 : 0;
+        else target = (d.angle < 110 || (vy > 0.3 && d.dy > 16)) ? 0 : 180;
       }
-      setFlip(d.card, target, true);
+      // Finish the flip at the speed of the swipe
+      const w = Math.abs(vy) / (cardH * 0.75) * 180;          // degrees per ms
+      const left = Math.abs(target - d.angle);
+      const ms = w > 0.05 ? clamp((2.5 * left) / w, 260, 650) : 600;
+      setFlip(d.card, target, true, Math.round(ms));
     }
-    springBack();
+    // Spring back into place
+    d.card.style.transition = reduceMotion.matches ? "transform .2s ease" : "transform .55s cubic-bezier(.2,1.25,.35,1)";
+    d.card.style.transform = depthTransform(0);
+    placeStack(true);
   }
   deck.addEventListener("pointerup", e => endDrag(e, false));
   deck.addEventListener("pointercancel", e => endDrag(e, true));
+  deck.addEventListener("lostpointercapture", e => endDrag(e, false));
   deck.addEventListener("pointerleave", e => { if (!drag && e.pointerType === "mouse") pointerTilt = null; });
 
   // Tap the cue buttons to flip
@@ -731,9 +817,10 @@ body{
     setFlip(card, b.dataset.flip === "up" ? 180 : 0, true);
   });
 
-  // ---- 3D tilt + moving light on the top card
+  // ---- 3D tilt + moving light on the top card (transform-only, so nothing is redrawn)
   let pointerTilt = null;
-  const tilt = { rx: 0, ry: 0, mx: 30, my: 0 };
+  const tilt = { rx: 0, ry: 0, mx: 45, my: 8 };
+  const REST = { rx: 0, ry: 0, mx: 30, my: 6 };
 
   function tiltFromPoint(px, py, strength){
     return { rx: -(py - 0.5) * 14 * strength, ry: (px - 0.5) * 16 * strength, mx: px * 100, my: py * 100 };
@@ -741,28 +828,23 @@ body{
 
   function frame(t){
     const top = cards[0];
-    if (top){
-      let target;
-      if (pointerTilt) target = pointerTilt;
-      else if (reduceMotion.matches) target = { rx: 0, ry: 0, mx: 30, my: 6 };
-      else target = {
+    if (top && top._glass){
+      const target = pointerTilt || (reduceMotion.matches ? REST : {
         rx: Math.sin(t / 2300) * 3.2,
         ry: Math.cos(t / 3100) * 4.4,
         mx: 45 + Math.cos(t / 3100) * 32,
         my: 8 + Math.sin(t / 2300) * 14
-      };
-      const k = pointerTilt ? 0.2 : 0.06;
+      });
+      const k = pointerTilt ? 0.22 : 0.06;
       tilt.rx += (target.rx - tilt.rx) * k;
       tilt.ry += (target.ry - tilt.ry) * k;
       tilt.mx += (target.mx - tilt.mx) * k;
       tilt.my += (target.my - tilt.my) * k;
-      const g = top.firstChild;
-      g.style.setProperty("--rx", tilt.rx.toFixed(2) + "deg");
-      g.style.setProperty("--ry", tilt.ry.toFixed(2) + "deg");
-      g.style.setProperty("--mx", tilt.mx.toFixed(1) + "%");
-      g.style.setProperty("--my", tilt.my.toFixed(1) + "%");
-      g.style.setProperty("--tx", (tilt.ry * 0.55).toFixed(2) + "px");
-      g.style.setProperty("--ty", (-tilt.rx * 0.55).toFixed(2) + "px");
+      top._glass.style.transform = "rotateX(" + tilt.rx.toFixed(2) + "deg) rotateY(" + tilt.ry.toFixed(2) + "deg)";
+      // The highlight is 180% of the card, so moving it 1% of its size moves the light 1.8% of the card
+      const sheen = "translate3d(" + ((tilt.mx - 50) / 1.8).toFixed(2) + "%," + ((tilt.my - 30) / 1.8).toFixed(2) + "%,0)";
+      top._sheens[0].style.transform = sheen;
+      top._sheens[1].style.transform = sheen;
     }
     requestAnimationFrame(frame);
   }
@@ -797,7 +879,7 @@ body{
   // Block pinch-zoom on iOS so swipes stay smooth
   document.addEventListener("gesturestart", e => e.preventDefault());
 
-  window.addEventListener("resize", () => { cards.forEach(fitCard); layout(false); });
+  window.addEventListener("resize", () => { cards.forEach(fitCard); measure(); layout(false); });
 
   document.getElementById("todayLabel").textContent =
     new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
