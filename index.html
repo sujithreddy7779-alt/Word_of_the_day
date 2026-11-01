@@ -174,7 +174,7 @@ body{
 .back-word{
   min-width:0;
   font-family:var(--font-display);font-variation-settings:"SOFT" 100;font-weight:650;
-  font-size:32px;line-height:1.05;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;
+  font-size:32px;line-height:1.05;letter-spacing:-.02em;white-space:nowrap;text-wrap:balance;overflow:hidden;
 }
 .tenses{list-style:none;margin-top:10px}
 .tenses li{padding:calc(var(--sent,17px) * .55) 0;border-top:1px solid var(--rule)}
@@ -434,9 +434,17 @@ body{
     fitWord(card);
 
     const bw = card.querySelector(".back-word");
+    const bwOver = () => bw.scrollWidth > bw.clientWidth + 1;
     let b = 32;
+    bw.style.whiteSpace = "nowrap";
     bw.style.fontSize = b + "px";
-    while (bw.scrollWidth > bw.clientWidth + 1 && b > 18){ b -= 1; bw.style.fontSize = b + "px"; }
+    while (bwOver() && b > 22){ b -= 1; bw.style.fontSize = b + "px"; }
+    if (bwOver() && bw.textContent.indexOf(" ") > -1){
+      bw.style.whiteSpace = "normal";
+      b = 28;
+      bw.style.fontSize = b + "px";
+    }
+    while (bwOver() && b > 16){ b -= 1; bw.style.fontSize = b + "px"; }
 
     const fc = card.querySelector(".front .content");
     const meaning = fc.querySelector(".meaning");
